@@ -5,7 +5,10 @@ import hudson.PluginWrapper;
 import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.util.LogTaskListener;
-import org.jenkinsci.plugins.envinject.EnvInjectAction;
+import org.jenkinsci.lib.envinject.EnvInjectAction;
+import org.jenkinsci.lib.envinject.service.EnvInjectActionRetriever;
+import org.jenkinsci.lib.envinject.service.EnvInjectDetector;
+import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,12 +24,13 @@ public class EnVarsGetter {
 
     private static Logger LOG = Logger.getLogger(EnVarsGetter.class.getName());
 
-    public Map<String, String> gatherJobEnvVars(AbstractBuild build) {
+    public Map<String, String> gatherJobEnvVars(AbstractBuild build) throws BuildContextException{
 
         Map<String, String> result = new HashMap<String, String>();
 
         //Use the envInject var if exists
-        if (isEnInjectActivated(build)) {
+        EnvInjectDetector detector = new EnvInjectDetector();
+        if (detector.isEnvInjectActivated(build)) {
             result.putAll(gatherEnvVarsFromEnvInject(build));
         } else {
 
@@ -34,9 +38,9 @@ public class EnVarsGetter {
             try {
                 result.putAll(build.getEnvironment(new LogTaskListener(LOG, Level.ALL)));
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new BuildContextException(e);
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new BuildContextException(e);
             }
 
             //Gather build vars
@@ -46,7 +50,7 @@ public class EnVarsGetter {
         return result;
     }
 
-    private Map<String, String> gatherBuildVariables(AbstractBuild build) {
+    private Map<String, String> gatherBuildVariables(AbstractBuild build) throws BuildContextException{
         Map<String, String> result = new HashMap<String, String>();
 
         //Add build process variables
@@ -63,23 +67,14 @@ public class EnVarsGetter {
         return result;
     }
 
-    private boolean isEnInjectActivated(AbstractBuild build) {
-        if (Hudson.getInstance().getPlugin("envinject") != null) {
-            EnvInjectAction envInjectAction = build.getAction(EnvInjectAction.class);
-            if (envInjectAction != null) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    private Map<String, String> gatherEnvVarsFromEnvInject(AbstractBuild build) {
+    private Map<String, String> gatherEnvVarsFromEnvInject(AbstractBuild build) throws BuildContextException{
         Map<String, String> result = new HashMap<String, String>();
-
-        EnvInjectAction envInjectAction = build.getAction(EnvInjectAction.class);
-        assert envInjectAction != null;
-        result.putAll(envInjectAction.getEnvMap());
-
+        EnvInjectActionRetriever retriever = new EnvInjectActionRetriever();
+        EnvInjectAction envInjectAction = retriever.getEnvInjectAction(build);
+        if (envInjectAction != null) {
+            result.putAll(envInjectAction.getEnvMap());
+        }
         return result;
     }
 
@@ -89,7 +84,7 @@ public class EnVarsGetter {
      *
      * @return the dictionary of the information
      */
-    public Map<String, Object> gatherInfraInfo() {
+    public Map<String, Object> gatherInfraInfo() throws BuildContextException {
 
         Map<String, Object> result = new HashMap<String, Object>();
         //Gets the jenkins version
@@ -102,7 +97,7 @@ public class EnVarsGetter {
         return result;
     }
 
-    private Map<String, String> gatherHudsonPlugins() {
+    private Map<String, String> gatherHudsonPlugins() throws BuildContextException{
         Map<String, String> pluginsInfo = new HashMap<String, String>();
         List<PluginWrapper> plugins = Hudson.getInstance().getPluginManager().getPlugins();
         for (PluginWrapper pluginWrapper : plugins) {

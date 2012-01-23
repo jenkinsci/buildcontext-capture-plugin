@@ -26,7 +26,6 @@
         <developer>
             <id>gbois</id>
             <name>Gregory Boissinot</name>
-            <email>gbois@dev.java.net</email>
             <timezone>+1</timezone>
             <roles>
                 <role>Project Owner</role>
@@ -39,8 +38,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
-        <envinject.jenkins.plugin.version>0.14-SNAPSHOT</envinject.jenkins.plugin.version>
         <jackson.version>1.8.5</jackson.version>
+        <envinject.lib.version>1.2</envinject.lib.version>
     </properties>
 
     <scm>
@@ -64,44 +63,44 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>envinject</artifactId>
-            <version>${envinject.jenkins.plugin.version}</version>
+            <groupId>org.jenkins-ci.lib</groupId>
+            <artifactId>envinject-lib</artifactId>
+            <version>${envinject.lib.version}</version>
             <type>jar</type>
         </dependency>
 
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.jenkins-ci.plugins</groupId>
-                                    <artifactId>envinject</artifactId>
-                                    <version>${envinject.jenkins.plugin.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/buildcontext-capture/WEB-INF/lib
-                                    </outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <!--<build>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<version>2.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>copy</id>-->
+                        <!--<phase>prepare-package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.jenkins-ci.plugins</groupId>-->
+                                    <!--<artifactId>envinject</artifactId>-->
+                                    <!--<version>${envinject.jenkins.plugin.version}</version>-->
+                                    <!--<type>jar</type>-->
+                                    <!--<overWrite>false</overWrite>-->
+                                    <!--<outputDirectory>${project.build.directory}/buildcontext-capture/WEB-INF/lib-->
+                                    <!--</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 
 </project>

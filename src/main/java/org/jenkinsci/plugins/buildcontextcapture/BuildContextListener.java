@@ -41,6 +41,9 @@ public class BuildContextListener extends RunListener<Run> {
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + ioe.getMessage());
             ioe.printStackTrace();
+        } catch (BuildContextException be) {
+            LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + be.getMessage());
+            be.printStackTrace();
         }
     }
 
