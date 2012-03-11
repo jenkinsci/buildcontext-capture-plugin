@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:optionalBlock name="on"
+                     title="${%Capture build context information}"
+                     checked="${instance.on}"
+                     help="/plugin/buildcontext-capture/help.html">
+
+        <f:entry title="${%Build Context Types}">
+
+            <f:hetero-list name="buildContextTypes"
+                           descriptors="${descriptor.listBuildContextCaptureDescriptors}"
+                           items="${instance.types}"
+                           addCaption="${%Add a build context type}"
+                           deleteCaption="${%Delete build context}"/>
+            <label class="attach-previous">Select different kinds of build context to capture</label>
+        </f:entry>
+
+    </f:optionalBlock>
+
+</j:jelly>

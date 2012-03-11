@@ -24,7 +24,7 @@ public class EnVarsGetter {
 
     private static Logger LOG = Logger.getLogger(EnVarsGetter.class.getName());
 
-    public Map<String, String> gatherJobEnvVars(AbstractBuild build) throws BuildContextException{
+    public Map<String, String> gatherJobEnvVars(AbstractBuild build) throws BuildContextException {
 
         Map<String, String> result = new HashMap<String, String>();
 
@@ -50,7 +50,7 @@ public class EnVarsGetter {
         return result;
     }
 
-    private Map<String, String> gatherBuildVariables(AbstractBuild build) throws BuildContextException{
+    private Map<String, String> gatherBuildVariables(AbstractBuild build) throws BuildContextException {
         Map<String, String> result = new HashMap<String, String>();
 
         //Add build process variables
@@ -68,7 +68,7 @@ public class EnVarsGetter {
     }
 
 
-    private Map<String, String> gatherEnvVarsFromEnvInject(AbstractBuild build) throws BuildContextException{
+    private Map<String, String> gatherEnvVarsFromEnvInject(AbstractBuild build) throws BuildContextException {
         Map<String, String> result = new HashMap<String, String>();
         EnvInjectActionRetriever retriever = new EnvInjectActionRetriever();
         EnvInjectAction envInjectAction = retriever.getEnvInjectAction(build);
@@ -97,7 +97,7 @@ public class EnVarsGetter {
         return result;
     }
 
-    private Map<String, String> gatherHudsonPlugins() throws BuildContextException{
+    private Map<String, String> gatherHudsonPlugins() throws BuildContextException {
         Map<String, String> pluginsInfo = new HashMap<String, String>();
         List<PluginWrapper> plugins = Hudson.getInstance().getPluginManager().getPlugins();
         for (PluginWrapper pluginWrapper : plugins) {

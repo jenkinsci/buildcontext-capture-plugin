@@ -1,16 +1,15 @@
 package org.jenkinsci.plugins.buildcontextcapture;
 
 import hudson.Extension;
+import hudson.matrix.MatrixRun;
 import hudson.model.AbstractBuild;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jenkinsci.plugins.buildcontextcapture.service.EnVarsGetter;
+import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,35 +23,48 @@ public class BuildContextListener extends RunListener<Run> {
 
     @Override
     public void onCompleted(Run run, TaskListener listener) {
-
-        EnVarsGetter enVarsGetter = new EnVarsGetter();
-        ObjectMapper mapper = new ObjectMapper();
         AbstractBuild build = (AbstractBuild) run;
-
         try {
-            //Gather infra info
-            Map<String, Object> infraInfo = enVarsGetter.gatherInfraInfo();
-            mapper.writeValue(getInfraStoredFile(build), infraInfo);
-
-            //Gather build jobs env vars
-            Map<String, String> jobEnvVars = enVarsGetter.gatherJobEnvVars(build);
-            mapper.writeValue(getJobEnvsStoredFile(build), jobEnvVars);
-
-        } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + ioe.getMessage());
-            ioe.printStackTrace();
+            BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
+            if (buildContextJobProperty != null) {
+                BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
+                File captureOutputFile = getBuildContextCaptureDir(build);
+                if (captureTypes != null) {
+                    for (BuildContextCaptureType captureType : captureTypes) {
+                        captureType.capture(build, captureOutputFile);
+                    }
+                }
+            }
         } catch (BuildContextException be) {
             LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + be.getMessage());
             be.printStackTrace();
         }
     }
 
+    private BuildContextJobProperty getEnvInjectJobProperty(AbstractBuild build) {
+        if (build == null) {
+            throw new IllegalArgumentException("A build object must be set.");
+        }
 
-    private File getInfraStoredFile(AbstractBuild build) {
-        return new File(build.getRootDir(), "buildContext-infra.json");
+        Job job;
+        if (build instanceof MatrixRun) {
+            job = ((MatrixRun) build).getParentBuild().getParent();
+        } else {
+            job = build.getParent();
+        }
+
+        BuildContextJobProperty contextJobProperty = (BuildContextJobProperty) job.getProperty(BuildContextJobProperty.class);
+
+        if (contextJobProperty != null) {
+            if (contextJobProperty.isOn()) {
+                return contextJobProperty;
+            }
+        }
+        return null;
     }
 
-    private File getJobEnvsStoredFile(AbstractBuild build) {
-        return new File(build.getRootDir(), "buildContext-job.json");
+    private File getBuildContextCaptureDir(AbstractBuild build) {
+        return new File(build.getRootDir(), "buildContext");
     }
+
 }
