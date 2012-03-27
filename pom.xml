@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>buildcontext-capture</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins BuildContext Capture Plug-in</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BuildContextCapture+Plugin</url>
