@@ -29,6 +29,7 @@ public class BuildContextListener extends RunListener<Run> {
             if (buildContextJobProperty != null) {
                 BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
                 File captureOutputFile = getBuildContextCaptureDir(build);
+                captureOutputFile.mkdirs();
                 if (captureTypes != null) {
                     for (BuildContextCaptureType captureType : captureTypes) {
                         captureType.capture(build, captureOutputFile);

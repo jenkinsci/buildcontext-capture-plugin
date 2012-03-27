@@ -40,7 +40,7 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <jackson.version>1.8.5</jackson.version>
-        <envinject.lib.version>1.2</envinject.lib.version>
+        <envinject.lib.version>1.3</envinject.lib.version>
     </properties>
 
     <scm>
