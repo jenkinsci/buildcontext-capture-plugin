@@ -23,16 +23,18 @@ public class BuildContextListener extends RunListener<Run> {
 
     @Override
     public void onCompleted(Run run, TaskListener listener) {
+        listener.getLogger().println("Capturing build context.");
         AbstractBuild build = (AbstractBuild) run;
         try {
             BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
             if (buildContextJobProperty != null) {
+                BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
                 BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
                 File captureOutputFile = getBuildContextCaptureDir(build);
                 captureOutputFile.mkdirs();
                 if (captureTypes != null) {
                     for (BuildContextCaptureType captureType : captureTypes) {
-                        captureType.capture(build, captureOutputFile);
+                        captureType.capture(build, captureOutputFile, descriptor.getFormat());
                     }
                 }
             }
@@ -42,6 +44,7 @@ public class BuildContextListener extends RunListener<Run> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private BuildContextJobProperty getEnvInjectJobProperty(AbstractBuild build) {
         if (build == null) {
             throw new IllegalArgumentException("A build object must be set.");

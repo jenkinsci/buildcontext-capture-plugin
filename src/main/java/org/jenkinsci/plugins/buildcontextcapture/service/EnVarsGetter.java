@@ -1,9 +1,7 @@
 package org.jenkinsci.plugins.buildcontextcapture.service;
 
 import hudson.FilePath;
-import hudson.PluginWrapper;
 import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
 import hudson.util.LogTaskListener;
 import org.jenkinsci.lib.envinject.EnvInjectAction;
 import org.jenkinsci.lib.envinject.service.EnvInjectActionRetriever;
@@ -11,8 +9,8 @@ import org.jenkinsci.lib.envinject.service.EnvInjectDetector;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * @author Gregory Boissinot
  */
-public class EnVarsGetter {
+public class EnVarsGetter implements Serializable {
 
     private static Logger LOG = Logger.getLogger(EnVarsGetter.class.getName());
 
@@ -50,6 +48,7 @@ public class EnVarsGetter {
         return result;
     }
 
+    @SuppressWarnings(value = "unchecked")
     private Map<String, String> gatherBuildVariables(AbstractBuild build) throws BuildContextException {
         Map<String, String> result = new HashMap<String, String>();
 
@@ -77,34 +76,5 @@ public class EnVarsGetter {
         }
         return result;
     }
-
-    /**
-     * Gathers all information from the Jenkins infrastructure (Hudson version,
-     * Plugins information, ...)
-     *
-     * @return the dictionary of the information
-     */
-    public Map<String, Object> gatherInfraInfo() throws BuildContextException {
-
-        Map<String, Object> result = new HashMap<String, Object>();
-        //Gets the jenkins version
-        String version = Hudson.getVersion().toString();
-        result.put("version", version);
-
-        //Gets the plugins information
-        Map<String, String> pluginsInfo = gatherHudsonPlugins();
-        result.put("plugins", pluginsInfo);
-        return result;
-    }
-
-    private Map<String, String> gatherHudsonPlugins() throws BuildContextException {
-        Map<String, String> pluginsInfo = new HashMap<String, String>();
-        List<PluginWrapper> plugins = Hudson.getInstance().getPluginManager().getPlugins();
-        for (PluginWrapper pluginWrapper : plugins) {
-            pluginsInfo.put(pluginWrapper.getLongName(), pluginWrapper.getVersion());
-        }
-        return pluginsInfo;
-    }
-
 
 }

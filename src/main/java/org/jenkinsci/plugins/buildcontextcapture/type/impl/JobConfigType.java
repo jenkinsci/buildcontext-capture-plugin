@@ -21,9 +21,14 @@ public class JobConfigType extends BuildContextCaptureType {
     }
 
     @Override
-    public void capture(AbstractBuild build, File outputCaptureDir) throws BuildContextException {
+    public void capture(AbstractBuild build, File outputCaptureDir, String format) throws BuildContextException {
         Job job = build.getProject();
         Util.copyFile(job.getConfigFile().getFile(), new File(outputCaptureDir, "config.xml"));
+    }
+
+    @Override
+    protected String getFileName() {
+        return null;
     }
 
     @Extension

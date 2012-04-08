@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @author Gregory Boissinot
  */
-public class BuildContextJobProperty extends JobProperty {
+public class BuildContextJobProperty extends JobProperty<Job<?, ?>> {
 
     private boolean on;
 
@@ -44,6 +44,18 @@ public class BuildContextJobProperty extends JobProperty {
     @Extension
     public static class BuildContextJobPropertyDescriptor extends JobPropertyDescriptor {
 
+        private String format;
+
+        public BuildContextJobPropertyDescriptor() {
+            super(BuildContextJobProperty.class);
+            load();
+        }
+
+        public BuildContextJobPropertyDescriptor(Class<? extends JobProperty<?>> clazz) {
+            super(clazz);
+            load();
+        }
+
         @Override
         public boolean isApplicable(Class<? extends Job> jobType) {
             return true;
@@ -54,9 +66,20 @@ public class BuildContextJobProperty extends JobProperty {
             return null;
         }
 
+        public String getFormat() {
+            return format;
+        }
+
         @SuppressWarnings({"unchecked", "unused"})
         public DescriptorExtensionList getListBuildContextCaptureDescriptors() {
             return DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), BuildContextCaptureType.class);
+        }
+
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+            format = json.getString("format");
+            save();
+            return true;
         }
 
         @Override

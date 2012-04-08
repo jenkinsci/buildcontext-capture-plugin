@@ -1,0 +1,23 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:section title="BuildContext Capture">
+
+        <f:entry field="format" title="${%Exported format}">
+
+            <f:radio name="format" value="TXT" checked="${descriptor.format=='TXT' or h.defaultToTrue(descriptor.format)}"/>
+            <label class="attach-previous">TXT</label>
+            <br/>
+
+            <f:radio name="format" value="XML" checked="${descriptor.format=='XML'}"/>
+            <label class="attach-previous">XML</label>
+            <br/>
+
+            <f:radio name="format" value="JSON" checked="${descriptor.format=='JSON'}"/>
+            <label class="attach-previous">JSON</label>
+            <br/>
+
+        </f:entry>
+
+    </f:section>
+</j:jelly>
+

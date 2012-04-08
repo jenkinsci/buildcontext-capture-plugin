@@ -20,7 +20,12 @@ public class LogType extends BuildContextCaptureType {
     }
 
     @Override
-    public void capture(AbstractBuild build, File outputCaptureDir) throws BuildContextException {
+    protected String getFileName() {
+        return null;
+    }
+
+    @Override
+    public void capture(AbstractBuild build, File outputCaptureDir, String format) throws BuildContextException {
         Util.copyFile(build.getLogFile(), new File(outputCaptureDir, "log"));
     }
 
