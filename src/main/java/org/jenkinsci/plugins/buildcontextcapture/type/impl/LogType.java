@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.buildcontextcapture.type.impl;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.AbstractBuild;
-import hudson.model.TaskListener;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
+import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -27,12 +27,12 @@ public class LogType extends BuildContextCaptureType {
     }
 
     @Override
-    public void captureAndExport(AbstractBuild build, TaskListener listener, File outputCaptureDir, String format) throws BuildContextException {
+    public void captureAndExport(AbstractBuild build, BuildContextLogger logger, File outputCaptureDir, String format) throws BuildContextException {
         Util.copyFile(build.getLogFile(), new File(outputCaptureDir, "log"));
     }
 
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, TaskListener listener) throws BuildContextException {
+    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
         return null;
     }
 

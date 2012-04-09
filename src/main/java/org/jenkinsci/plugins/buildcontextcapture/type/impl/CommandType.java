@@ -12,6 +12,7 @@ import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
+import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
@@ -44,7 +45,7 @@ public class CommandType extends BuildContextCaptureType {
     }
 
     @Override
-    public void captureAndExport(AbstractBuild build, final TaskListener listener, final File outputCaptureDir, String format) throws BuildContextException {
+    protected void captureAndExport(AbstractBuild build, BuildContextLogger logger, final File outputCaptureDir, String format) throws BuildContextException {
 
         EnvVarsGetter envVarsGetter = new EnvVarsGetter();
         final Map<String, String> envVars = envVarsGetter.gatherJobEnvVars(build);
@@ -63,61 +64,24 @@ public class CommandType extends BuildContextCaptureType {
             if (rootPath != null) {
                 try {
 
-                    boolean isUnix = rootPath.act(new Callable<Boolean, Throwable>() {
-                        public Boolean call() throws Throwable {
-                            return File.pathSeparatorChar == ':';
-                        }
-                    });
-
-                    CommandInterpreter batchRunner;
-                    if (isUnix) {
-                        batchRunner = new Shell(scriptContent);
-                    } else {
-                        batchRunner = new BatchFile(scriptContent);
+                    if (filePath == null) {
+                        logger.info("You have to give a captured file path");
+                        return;
                     }
-                    FilePath tmpFile;
-                    try {
-                        tmpFile = batchRunner.createScriptFile(rootPath);
-                    } catch (IOException ioe) {
-                        throw new BuildContextException(ioe);
-                    } catch (InterruptedException ie) {
-                        throw new BuildContextException(ie);
+
+                    //Execute script
+                    if (scriptContent != null) {
+                        logger.info(String.format("Executing the captured script %s", scriptContent));
+                        executeScript(logger, envVars, workspace, rootPath);
                     }
-                    final String[] cmd = batchRunner.buildCommandLine(tmpFile);
 
-                    FilePath generatedFile = rootPath.act(new Callable<FilePath, BuildContextException>() {
-                        public FilePath call() throws BuildContextException {
-                            Launcher launcher = new Launcher.LocalLauncher(listener);
-                            try {
-                                int exitCode = launcher.launch().cmds(cmd).envs(envVars).stdout(listener).pwd(workspace).join();
-                                if (exitCode != 0) {
-                                    throw new BuildContextException("The expected exit code is " + exitCode);
-                                }
-
-                            } catch (IOException ioe) {
-                                throw new BuildContextException(ioe);
-                            } catch (InterruptedException ie) {
-                                throw new BuildContextException(ie);
-                            }
-
-                            FilePath createdFile = new FilePath(workspace, filePath);
-                            try {
-                                if (!createdFile.exists()) {
-                                    throw new BuildContextException("The executed command doesn't create the expected file" + filePath);
-                                }
-                                return createdFile;
-                            } catch (IOException ioe) {
-                                throw new BuildException(ioe);
-                            } catch (InterruptedException ie) {
-                                throw new BuildException(ie);
-                            }
-                        }
-                    });
-
-                    //Execute on master
-                    if (generatedFile != null) {
-                        build.getWorkspace().copyRecursiveTo(generatedFile.getName(), new FilePath(outputCaptureDir));
+                    //Capture file
+                    FilePath capturedFilePath = new FilePath(build.getWorkspace(), filePath);
+                    if (!capturedFilePath.exists()) {
+                        logger.info(String.format("The captured script doesn't exist. You have to generate it", capturedFilePath.getRemote()));
+                        return;
                     }
+                    build.getWorkspace().copyRecursiveTo(capturedFilePath.getName(), new FilePath(outputCaptureDir));
 
                 } catch (Throwable throwable) {
                     throw new BuildContextException(throwable);
@@ -127,8 +91,62 @@ public class CommandType extends BuildContextCaptureType {
         }
     }
 
+    private void executeScript(BuildContextLogger logger, final Map<String, String> envVars, final FilePath workspace, FilePath rootPath) throws Throwable {
+        boolean isUnix = rootPath.act(new Callable<Boolean, Throwable>() {
+            public Boolean call() throws Throwable {
+                return File.pathSeparatorChar == ':';
+            }
+        });
+
+        final TaskListener listener = logger.getListener();
+        CommandInterpreter batchRunner;
+        if (isUnix) {
+            batchRunner = new Shell(scriptContent);
+        } else {
+            batchRunner = new BatchFile(scriptContent);
+        }
+        FilePath tmpFile;
+        try {
+            tmpFile = batchRunner.createScriptFile(rootPath);
+        } catch (IOException ioe) {
+            throw new BuildContextException(ioe);
+        } catch (InterruptedException ie) {
+            throw new BuildContextException(ie);
+        }
+        final String[] cmd = batchRunner.buildCommandLine(tmpFile);
+
+        rootPath.act(new Callable<FilePath, BuildContextException>() {
+            public FilePath call() throws BuildContextException {
+                Launcher launcher = new Launcher.LocalLauncher(listener);
+                try {
+                    int exitCode = launcher.launch().cmds(cmd).envs(envVars).stdout(listener).pwd(workspace).join();
+                    if (exitCode != 0) {
+                        throw new BuildContextException("The expected exit code is " + exitCode);
+                    }
+
+                } catch (IOException ioe) {
+                    throw new BuildContextException(ioe);
+                } catch (InterruptedException ie) {
+                    throw new BuildContextException(ie);
+                }
+
+                FilePath createdFile = new FilePath(workspace, filePath);
+                try {
+                    if (!createdFile.exists()) {
+                        throw new BuildContextException("The executed command doesn't create the expected file" + filePath);
+                    }
+                    return createdFile;
+                } catch (IOException ioe) {
+                    throw new BuildException(ioe);
+                } catch (InterruptedException ie) {
+                    throw new BuildException(ie);
+                }
+            }
+        });
+    }
+
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, TaskListener listener) throws BuildContextException {
+    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
         return null;
     }
 
@@ -148,7 +166,7 @@ public class CommandType extends BuildContextCaptureType {
 
         @Override
         public String getDisplayName() {
-            return "through a command";
+            return "Elements by a script execution";
         }
 
         @Override

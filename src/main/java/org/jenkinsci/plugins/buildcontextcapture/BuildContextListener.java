@@ -37,7 +37,8 @@ public class BuildContextListener extends RunListener<Run> {
                             captureOutputDir.mkdirs();
                             if (captureTypes != null) {
                                 for (BuildContextCaptureType captureType : captureTypes) {
-                                    captureType.capture(build, listener, captureOutputDir, descriptor.getFormat());
+                                    BuildContextLogger logger = new BuildContextLogger(listener);
+                                    captureType.capture(build, logger, captureOutputDir, descriptor.getFormat());
                                 }
                             }
                         }

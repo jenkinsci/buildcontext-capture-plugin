@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.buildcontextcapture.type.impl;
 
 import hudson.Extension;
 import hudson.model.AbstractBuild;
-import hudson.model.TaskListener;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
+import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
@@ -26,7 +26,7 @@ public class EnvVarsType extends BuildContextCaptureType {
     }
 
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, TaskListener listener) throws BuildContextException {
+    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
         EnvVarsGetter enVarsGetter = new EnvVarsGetter();
         return enVarsGetter.gatherJobEnvVars(build);
     }
