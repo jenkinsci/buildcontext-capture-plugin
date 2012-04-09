@@ -2,11 +2,9 @@ package org.jenkinsci.plugins.buildcontextcapture;
 
 import hudson.Extension;
 import hudson.matrix.MatrixRun;
-import hudson.model.AbstractBuild;
-import hudson.model.Job;
-import hudson.model.Run;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.model.listeners.RunListener;
+import hudson.remoting.Callable;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 
 import java.io.File;
@@ -22,27 +20,41 @@ public class BuildContextListener extends RunListener<Run> {
     private static Logger LOGGER = Logger.getLogger(BuildContextListener.class.getName());
 
     @Override
-    public void onCompleted(Run run, TaskListener listener) {
-        listener.getLogger().println("Capturing build context.");
-        AbstractBuild build = (AbstractBuild) run;
+    public void onCompleted(final Run run, final TaskListener listener) {
+
         try {
-            BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
-            if (buildContextJobProperty != null) {
-                BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
-                BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
-                File captureOutputFile = getBuildContextCaptureDir(build);
-                captureOutputFile.mkdirs();
-                if (captureTypes != null) {
-                    for (BuildContextCaptureType captureType : captureTypes) {
-                        captureType.capture(build, captureOutputFile, descriptor.getFormat());
+            Hudson.getInstance().getRootPath().act(new Callable() {
+
+                public Void call() throws Throwable {
+                    listener.getLogger().println("Capturing build context.");
+                    AbstractBuild build = (AbstractBuild) run;
+                    try {
+                        BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
+                        if (buildContextJobProperty != null) {
+                            BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
+                            BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
+                            File captureOutputDir = getBuildContextCaptureDir(build);
+                            captureOutputDir.mkdirs();
+                            if (captureTypes != null) {
+                                for (BuildContextCaptureType captureType : captureTypes) {
+                                    captureType.capture(build, listener, captureOutputDir, descriptor.getFormat());
+                                }
+                            }
+                        }
+
+                    } catch (BuildContextException be) {
+                        LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + be.getMessage());
+                        be.printStackTrace();
                     }
+
+                    return null;
                 }
-            }
-        } catch (BuildContextException be) {
-            LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + be.getMessage());
-            be.printStackTrace();
+            });
+        } catch (Throwable throwable) {
+            listener.getLogger().println("BuildContextCapture - Error :" + throwable.getMessage());
         }
     }
+
 
     @SuppressWarnings("unchecked")
     private BuildContextJobProperty getEnvInjectJobProperty(AbstractBuild build) {

@@ -4,7 +4,8 @@
 
         <f:entry field="format" title="${%Exported format}">
 
-            <f:radio name="format" value="TXT" checked="${descriptor.format=='TXT' or h.defaultToTrue(descriptor.format)}"/>
+            <f:radio name="format" value="TXT"
+                     checked="${descriptor.format=='TXT' or h.defaultToTrue(descriptor.format)}"/>
             <label class="attach-previous">TXT</label>
             <br/>
 

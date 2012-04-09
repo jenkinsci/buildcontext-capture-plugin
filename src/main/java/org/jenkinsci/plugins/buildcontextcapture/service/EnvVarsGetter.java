@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 /**
  * @author Gregory Boissinot
  */
-public class EnVarsGetter implements Serializable {
+public class EnvVarsGetter implements Serializable {
 
-    private static Logger LOG = Logger.getLogger(EnVarsGetter.class.getName());
+    private static Logger LOG = Logger.getLogger(EnvVarsGetter.class.getName());
 
     public Map<String, String> gatherJobEnvVars(AbstractBuild build) throws BuildContextException {
 
