@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
 
-    <f:entry title="${descriptor.label}" help="/descriptor/${descriptor.typePackageName}/help/type">
+    <f:entry title="${descriptor.label}" help="/descriptor/${descriptor.typeName}/help/type">
     </f:entry>
 
 </j:jelly>

@@ -12,7 +12,7 @@ public abstract class BuildContextCaptureTypeDescriptor<T extends BuildContextCa
     public abstract Class<? extends BuildContextCaptureType> getType();
 
     @SuppressWarnings("unused")
-    public String getTypePackageName() {
+    public String getTypeName() {
         return getType().getName();
     }
 
