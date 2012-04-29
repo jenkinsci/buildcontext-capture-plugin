@@ -1,0 +1,17 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:t="/lib/hudson">
+    <j:set var="elements" value="${it.elements}"/>
+    <j:if test="${elements != null}">
+        <t:summary icon="package.gif">
+            ${%Last Captured BuildContext elements}
+            <ul>
+                <j:forEach var="element" items="${elements}">
+                    <li>
+                        <a href="capturedBuildContextElements/download/?localPath=${h.escape(element.localPath)}/">${h.escape(element.fileName)}</a>
+                        <br/>
+                    </li>
+                </j:forEach>
+            </ul>
+        </t:summary>
+    </j:if>
+</j:jelly>
