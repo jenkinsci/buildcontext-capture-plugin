@@ -1,55 +1,64 @@
 package org.jenkinsci.plugins.buildcontextcapture.type.impl;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
+import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
+import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Gregory Boissinot
  */
-public class BuildTimeType extends BuildContextCaptureType {
+public class BuildTimeType extends FlexibleBuildContextCaptureType {
 
     @DataBoundConstructor
     public BuildTimeType() {
     }
 
     @Override
-    public void captureAndExport(AbstractBuild build, BuildContextLogger logger, File outputCaptureDir, String format) throws BuildContextException {
+    public void captureAndExport(AbstractBuild build, FilePath outputDir, BuildContextLogger logger) throws BuildContextException {
         try {
-            FileWriter writer = new FileWriter(new File(outputCaptureDir, "buildtime"));
-            //Warning: the value is captured at runtime and not totally at the end of the build
-            writer.write(String.valueOf(build.getDuration()));
-            writer.close();
+            FilePath buildTimeFilePath = getExportedFilePath(outputDir);
+            final long duration = build.getDuration();
+            buildTimeFilePath.act(new FilePath.FileCallable<Void>() {
+                public Void invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
+                    FileWriter writer = new FileWriter(f);
+                    //Warning: the value is captured at runtime and not totally at the end of the build
+                    writer.write(String.valueOf(duration));
+                    writer.close();
+                    return null;
+                }
+            });
         } catch (IOException ioe) {
             throw new BuildContextException(ioe);
+        } catch (InterruptedException ie) {
+            throw new BuildContextException(ie);
         }
     }
 
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
-        return null;
+    public FilePath getExportedFilePath(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
+        return getExportedFilePath(getExportedDir(build));
     }
 
-    @Override
-    protected String getFileName() {
-        return null;
+    private FilePath getExportedFilePath(FilePath outputDir) {
+        return outputDir.child("buildtime");
     }
 
     @Extension
     @SuppressWarnings("unused")
-    public static class BuildTimeTypeDescriptor extends BuildContextCaptureTypeDescriptor<BuildTimeType> {
+    public static class BuildTimeTypeDescriptor extends FlexibleBuildContextCaptureTypeDescriptor<BuildTimeType> {
 
         @Override
-        public Class<? extends BuildContextCaptureType> getType() {
+        public Class<? extends FlexibleBuildContextCaptureType> getType() {
             return BuildTimeType.class;
         }
 

@@ -7,7 +7,6 @@ import hudson.model.listeners.RunListener;
 import hudson.remoting.Callable;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,17 +31,15 @@ public class BuildContextListener extends RunListener<Run> {
                         BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
                         if (buildContextJobProperty != null) {
                             BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
+                            build.addAction(new BuildContextCaptureAction(descriptor.getFormat()));
                             BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
-                            File captureOutputDir = getBuildContextCaptureDir(build);
-                            captureOutputDir.mkdirs();
                             if (captureTypes != null) {
                                 for (BuildContextCaptureType captureType : captureTypes) {
                                     BuildContextLogger logger = new BuildContextLogger(listener);
-                                    captureType.capture(build, logger, captureOutputDir, descriptor.getFormat());
+                                    captureType.capture(build, logger);
                                 }
                             }
                         }
-
                     } catch (BuildContextException be) {
                         LOGGER.log(Level.SEVERE, "Problems occurs to capture build context: " + be.getMessage());
                         be.printStackTrace();
@@ -78,10 +75,6 @@ public class BuildContextListener extends RunListener<Run> {
             }
         }
         return null;
-    }
-
-    private File getBuildContextCaptureDir(AbstractBuild build) {
-        return new File(build.getRootDir(), "buildContext");
     }
 
 }

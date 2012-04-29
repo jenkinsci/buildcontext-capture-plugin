@@ -5,11 +5,11 @@ import hudson.model.Descriptor;
 /**
  * @author Gregory Boissinot
  */
-public abstract class BuildContextCaptureTypeDescriptor<T extends BuildContextCaptureType> extends Descriptor<BuildContextCaptureType> {
+public abstract class FlexibleBuildContextCaptureTypeDescriptor<T extends BuildContextCaptureType> extends Descriptor<FlexibleBuildContextCaptureType> {
 
     public abstract String getLabel();
 
-    public abstract Class<? extends BuildContextCaptureType> getType();
+    public abstract Class<? extends FlexibleBuildContextCaptureType> getType();
 
     @SuppressWarnings("unused")
     public String getTypeName() {

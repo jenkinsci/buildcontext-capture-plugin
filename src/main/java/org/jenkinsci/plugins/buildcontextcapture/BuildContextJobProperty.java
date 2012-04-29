@@ -10,6 +10,8 @@ import net.sf.json.JSON;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
+import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
+import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureType;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.List;
@@ -72,7 +74,9 @@ public class BuildContextJobProperty extends JobProperty<Job<?, ?>> {
 
         @SuppressWarnings({"unchecked", "unused"})
         public DescriptorExtensionList getListBuildContextCaptureDescriptors() {
-            return DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), BuildContextCaptureType.class);
+            DescriptorExtensionList list = DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), FlexibleBuildContextCaptureType.class);
+            list.addAll(DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), WizardBuildContextCaptureType.class));
+            return list;
         }
 
         @Override

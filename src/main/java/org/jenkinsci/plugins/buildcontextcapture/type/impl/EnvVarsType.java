@@ -5,8 +5,8 @@ import hudson.model.AbstractBuild;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
+import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureType;
+import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author Gregory Boissinot
  */
-public class EnvVarsType extends BuildContextCaptureType {
+public class EnvVarsType extends WizardBuildContextCaptureType {
 
     @DataBoundConstructor
     public EnvVarsType() {
@@ -26,17 +26,17 @@ public class EnvVarsType extends BuildContextCaptureType {
     }
 
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
+    protected Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
         EnvVarsGetter enVarsGetter = new EnvVarsGetter();
         return enVarsGetter.gatherJobEnvVars(build);
     }
 
     @Extension
     @SuppressWarnings("unused")
-    public static class EnvVarsTypeDescriptor extends BuildContextCaptureTypeDescriptor<EnvVarsType> {
+    public static class EnvVarsTypeDescriptor extends WizardBuildContextCaptureTypeDescriptor<EnvVarsType> {
 
         @Override
-        public Class<? extends BuildContextCaptureType> getType() {
+        public Class<? extends WizardBuildContextCaptureType> getType() {
             return EnvVarsType.class;
         }
 

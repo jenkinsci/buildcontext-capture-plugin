@@ -14,8 +14,8 @@ import hudson.tasks.Shell;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
+import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
+import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Gregory Boissinot
  */
-public class CommandType extends BuildContextCaptureType {
+public class CommandType extends FlexibleBuildContextCaptureType {
 
     private String scriptContent;
     private String filePath;
@@ -45,7 +45,7 @@ public class CommandType extends BuildContextCaptureType {
     }
 
     @Override
-    protected void captureAndExport(AbstractBuild build, BuildContextLogger logger, final File outputCaptureDir, String format) throws BuildContextException {
+    public void captureAndExport(AbstractBuild build, FilePath outputDir, BuildContextLogger logger) throws BuildContextException {
 
         EnvVarsGetter envVarsGetter = new EnvVarsGetter();
         final Map<String, String> envVars = envVarsGetter.gatherJobEnvVars(build);
@@ -81,12 +81,11 @@ public class CommandType extends BuildContextCaptureType {
                         logger.info(String.format("The captured script doesn't exist. You have to generate it", capturedFilePath.getRemote()));
                         return;
                     }
-                    build.getWorkspace().copyRecursiveTo(capturedFilePath.getName(), new FilePath(outputCaptureDir));
+                    build.getWorkspace().copyRecursiveTo(capturedFilePath.getName(), outputDir);
 
                 } catch (Throwable throwable) {
                     throw new BuildContextException(throwable);
                 }
-
             }
         }
     }
@@ -146,21 +145,28 @@ public class CommandType extends BuildContextCaptureType {
     }
 
     @Override
-    public Map<String, ? extends Object> getCapturedElements(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
-        return null;
-    }
+    public FilePath getExportedFilePath(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {
 
-    @Override
-    protected String getFileName() {
-        return null;
+        FilePath initialFile = new FilePath(build.getWorkspace(), filePath);
+        try {
+            if (!initialFile.exists()) {
+                throw new BuildContextException("The file " + initialFile.getRemote() + " must exist.");
+            }
+            FilePath outputDir = getExportedDir(build);
+            return outputDir.child(initialFile.getName());
+        } catch (IOException ioe) {
+            throw new BuildContextException(ioe);
+        } catch (InterruptedException ie) {
+            throw new BuildContextException(ie);
+        }
     }
 
     @Extension
     @SuppressWarnings("unused")
-    public static class CommandTypeDescriptor extends BuildContextCaptureTypeDescriptor<CommandType> {
+    public static class CommandTypeDescriptor extends FlexibleBuildContextCaptureTypeDescriptor<CommandType> {
 
         @Override
-        public Class<? extends BuildContextCaptureType> getType() {
+        public Class<? extends FlexibleBuildContextCaptureType> getType() {
             return CommandType.class;
         }
 
