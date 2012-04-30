@@ -1,7 +1,7 @@
 package org.jenkinsci.plugins.buildcontextcapture.pz;
 
+import hudson.model.AbstractBuild;
 import hudson.model.Action;
-import hudson.model.Hudson;
 import hudson.model.Job;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -41,9 +41,12 @@ public class BuildContextCaptureAction implements Action, Serializable {
         BuildContextCaptureUIElement uiElement = new BuildContextCaptureUIElement(localPath);
         response.setHeader("Content-Disposition", "attachment;filename=\"" + uiElement.getFileName() + "\"");
 
-        File rootDir = Hudson.getInstance().getRootDir();
-        Job job = request.findAncestorObject(Job.class);
-        String prefix = rootDir + "/jobs/" + job.getName();
+        AbstractBuild build = getLastBuild(request);
+        if (build == null) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can't get the last build.");
+            return;
+        }
+        String prefix = build.getRootDir().getPath();
 
         File buildContextCaptureFile = new File(prefix + "/" + localPath);
         if (buildContextCaptureFile.exists()) {
@@ -52,6 +55,15 @@ public class BuildContextCaptureAction implements Action, Serializable {
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
 
+    }
+
+    private AbstractBuild getLastBuild(StaplerRequest request) {
+        AbstractBuild build = request.findAncestorObject(AbstractBuild.class);
+        if (build == null) {
+            Job job = request.findAncestorObject(Job.class);
+            build = (AbstractBuild) job.getLastBuild();
+        }
+        return build;
     }
 
 }

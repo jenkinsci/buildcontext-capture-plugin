@@ -10,7 +10,6 @@ import org.jenkinsci.plugins.buildcontextcapture.pz.BuildContextCaptureBuildActi
 import org.jenkinsci.plugins.buildcontextcapture.pz.BuildContextCaptureUIElement;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,10 @@ public class BuildContextListener extends RunListener<Run> {
         final BuildContextLogger logger = new BuildContextLogger(listener);
         BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
         if (buildContextJobProperty != null) {
+
             BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
             build.addAction(new BuildContextCaptureAction(descriptor.getFormat()));
+
             BuildContextCaptureType[] captureTypes = buildContextJobProperty.getTypes();
             if (captureTypes != null) {
 
@@ -62,15 +63,11 @@ public class BuildContextListener extends RunListener<Run> {
 
     private BuildContextCaptureUIElement getBuildContextCaptureUIElement(AbstractBuild build, FilePath buildContextCaptureFilePath) {
 
-        AbstractProject project = build.getProject();
-        File jenkinsRootDir = Hudson.getInstance().getRootDir();
         String buildContextCaptureFilePathString = buildContextCaptureFilePath.getRemote();
-
-        String startLocalPath = jenkinsRootDir + "/jobs/" + project.getName();
+        String startLocalPath = build.getRootDir().getPath();
         String localPath = buildContextCaptureFilePathString.substring(buildContextCaptureFilePathString.indexOf(startLocalPath) + startLocalPath.length());
 
-        BuildContextCaptureUIElement uiElement = new BuildContextCaptureUIElement(localPath);
-        return uiElement;
+        return new BuildContextCaptureUIElement(localPath);
     }
 
     @SuppressWarnings("unchecked")

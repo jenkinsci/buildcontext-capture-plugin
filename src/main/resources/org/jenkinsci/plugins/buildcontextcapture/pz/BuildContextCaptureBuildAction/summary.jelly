@@ -7,7 +7,9 @@
             <ul>
                 <j:forEach var="element" items="${elements}">
                     <li>
-                        <a href="capturedBuildContextElements/download/?localPath=${h.escape(element.localPath)}/">${h.escape(element.fileName)}</a>
+                        <a href="capturedBuildContextElements/download/?localPath=${h.escape(element.localPath)}/">
+                            ${h.escape(element.fileName)}
+                        </a>
                         <br/>
                     </li>
                 </j:forEach>
