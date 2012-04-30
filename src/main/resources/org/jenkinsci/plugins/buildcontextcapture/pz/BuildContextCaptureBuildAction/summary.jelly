@@ -3,7 +3,7 @@
     <j:set var="elements" value="${it.elements}"/>
     <j:if test="${elements != null}">
         <t:summary icon="package.gif">
-            ${%Last Captured BuildContext elements}
+            ${%Captured BuildContext elements}
             <ul>
                 <j:forEach var="element" items="${elements}">
                     <li>

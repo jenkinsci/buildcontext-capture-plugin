@@ -2,18 +2,18 @@ package org.jenkinsci.plugins.buildcontextcapture;
 
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import hudson.model.Hudson;
-import hudson.model.Job;
-import hudson.model.JobProperty;
-import hudson.model.JobPropertyDescriptor;
+import hudson.model.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.buildcontextcapture.pz.BuildContextCaptureProjectAction;
 import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureType;
 import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
 import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureType;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -41,6 +41,10 @@ public class BuildContextJobProperty extends JobProperty<Job<?, ?>> {
         this.types = types;
     }
 
+    @Override
+    public Collection<? extends Action> getJobActions(Job<?, ?> job) {
+        return Arrays.asList(new Action[]{new BuildContextCaptureProjectAction((AbstractProject) job)});
+    }
 
     @SuppressWarnings("unused")
     @Extension

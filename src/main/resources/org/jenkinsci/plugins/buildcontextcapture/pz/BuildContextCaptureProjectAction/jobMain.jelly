@@ -1,0 +1,21 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:t="/lib/hudson">
+    <j:set var="elements" value="${it.elements}"/>
+    <j:if test="${elements != null}">
+        <table style="margin-top: 1em; margin-left:1em;">
+            <t:summary icon="package.gif">
+                ${%Last Captured BuildContext elements}
+                <ul>
+                    <j:forEach var="element" items="${elements}">
+                        <li>
+                            <a href="capturedBuildContextElements/download/?localPath=${h.escape(element.localPath)}/">
+                                ${h.escape(element.fileName)}
+                            </a>
+                            <br/>
+                        </li>
+                    </j:forEach>
+                </ul>
+            </t:summary>
+        </table>
+    </j:if>
+</j:jelly>
