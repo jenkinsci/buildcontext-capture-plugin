@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core"
          xmlns:t="/lib/hudson">
     <j:set var="elements" value="${it.elements}"/>
-    <j:if test="${elements != null}">
+    <j:if test="${elements != null and elements.size()!=0}">
         <t:summary icon="package.gif">
             ${%Captured BuildContext elements}
             <ul>

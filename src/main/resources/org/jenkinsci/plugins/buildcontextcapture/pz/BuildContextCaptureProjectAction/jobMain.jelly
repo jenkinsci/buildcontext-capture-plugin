@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core"
          xmlns:t="/lib/hudson">
     <j:set var="elements" value="${it.elements}"/>
-    <j:if test="${elements != null}">
+    <j:if test="${elements != null and elements.size()!=0}">
         <table style="margin-top: 1em; margin-left:1em;">
             <t:summary icon="package.gif">
                 ${%Last Captured BuildContext elements}
