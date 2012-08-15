@@ -14,8 +14,8 @@ import hudson.tasks.Shell;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
+import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
 import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -163,7 +163,7 @@ public class CommandType extends FlexibleBuildContextCaptureType {
 
     @Extension
     @SuppressWarnings("unused")
-    public static class CommandTypeDescriptor extends FlexibleBuildContextCaptureTypeDescriptor<CommandType> {
+    public static class CommandTypeDescriptor extends BuildContextCaptureTypeDescriptor<CommandType> {
 
         @Override
         public Class<? extends FlexibleBuildContextCaptureType> getType() {

@@ -78,8 +78,8 @@ public class BuildContextJobProperty extends JobProperty<Job<?, ?>> {
 
         @SuppressWarnings({"unchecked", "unused"})
         public DescriptorExtensionList getListBuildContextCaptureDescriptors() {
-            DescriptorExtensionList list = DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), FlexibleBuildContextCaptureType.class);
-            list.addAll(DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), WizardBuildContextCaptureType.class));
+            DescriptorExtensionList list = DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), BuildContextCaptureType.class);
+            //list.addAll(DescriptorExtensionList.createDescriptorList(Hudson.getInstance(), BuildContextCaptureType.class));
             return list;
         }
 

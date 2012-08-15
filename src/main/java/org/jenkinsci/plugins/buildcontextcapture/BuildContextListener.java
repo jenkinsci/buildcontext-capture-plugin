@@ -22,12 +22,12 @@ public class BuildContextListener extends RunListener<Run> {
     @Override
     public void onCompleted(final Run run, final TaskListener listener) {
 
-        listener.getLogger().println("Capturing build context.");
         final AbstractBuild build = (AbstractBuild) run;
         final BuildContextLogger logger = new BuildContextLogger(listener);
         BuildContextJobProperty buildContextJobProperty = getEnvInjectJobProperty(build);
         if (buildContextJobProperty != null) {
 
+            listener.getLogger().println("Capturing build context information.");
             BuildContextJobProperty.BuildContextJobPropertyDescriptor descriptor = (BuildContextJobProperty.BuildContextJobPropertyDescriptor) buildContextJobProperty.getDescriptor();
             build.addAction(new BuildContextCaptureAction(descriptor.getFormat()));
 

@@ -5,8 +5,8 @@ import hudson.model.AbstractBuild;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 import org.jenkinsci.plugins.buildcontextcapture.service.EnvVarsGetter;
+import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
 import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.WizardBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ public class EnvVarsType extends WizardBuildContextCaptureType {
 
     @Extension
     @SuppressWarnings("unused")
-    public static class EnvVarsTypeDescriptor extends WizardBuildContextCaptureTypeDescriptor<EnvVarsType> {
+    public static class EnvVarsTypeDescriptor extends BuildContextCaptureTypeDescriptor<EnvVarsType> {
 
         @Override
         public Class<? extends WizardBuildContextCaptureType> getType() {

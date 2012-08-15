@@ -1,19 +1,25 @@
 package org.jenkinsci.plugins.buildcontextcapture.type;
 
+import hudson.ExtensionPoint;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.remoting.Callable;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * @author Gregory Boissinot
  */
-public abstract class BuildContextCaptureType implements Serializable {
+public abstract class BuildContextCaptureType implements ExtensionPoint, Describable<BuildContextCaptureType> {
+
+    public Descriptor<BuildContextCaptureType> getDescriptor() {
+        return (BuildContextCaptureTypeDescriptor) Hudson.getInstance().getDescriptor(getClass());
+    }
 
     public abstract void capture(AbstractBuild build, BuildContextLogger logger) throws BuildContextException;
 

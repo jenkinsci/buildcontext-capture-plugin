@@ -7,8 +7,8 @@ import hudson.model.AbstractBuild;
 import hudson.remoting.VirtualChannel;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
+import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
 import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -48,7 +48,7 @@ public class LogType extends FlexibleBuildContextCaptureType {
 
     @Extension
     @SuppressWarnings("unused")
-    public static class LogTypeDescriptor extends FlexibleBuildContextCaptureTypeDescriptor<LogType> {
+    public static class LogTypeDescriptor extends BuildContextCaptureTypeDescriptor<LogType> {
 
         @Override
         public Class<? extends FlexibleBuildContextCaptureType> getType() {

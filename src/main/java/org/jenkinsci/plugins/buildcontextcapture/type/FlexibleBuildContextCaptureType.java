@@ -12,11 +12,7 @@ import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
 /**
  * @author Gregory Boissinot
  */
-public abstract class FlexibleBuildContextCaptureType extends BuildContextCaptureType implements ExtensionPoint, Describable<FlexibleBuildContextCaptureType> {
-
-    public Descriptor<FlexibleBuildContextCaptureType> getDescriptor() {
-        return (FlexibleBuildContextCaptureTypeDescriptor) Hudson.getInstance().getDescriptor(getClass());
-    }
+public abstract class FlexibleBuildContextCaptureType extends BuildContextCaptureType {
 
     @Override
     public void capture(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {

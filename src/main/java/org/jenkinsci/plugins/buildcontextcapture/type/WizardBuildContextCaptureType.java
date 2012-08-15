@@ -17,11 +17,7 @@ import java.util.Map;
 /**
  * @author Gregory Boissinot
  */
-public abstract class WizardBuildContextCaptureType extends BuildContextCaptureType implements ExtensionPoint, Describable<WizardBuildContextCaptureType> {
-
-    public Descriptor<WizardBuildContextCaptureType> getDescriptor() {
-        return (WizardBuildContextCaptureTypeDescriptor) Hudson.getInstance().getDescriptor(getClass());
-    }
+public abstract class WizardBuildContextCaptureType extends BuildContextCaptureType {
 
     @Override
     public void capture(AbstractBuild build, BuildContextLogger logger) throws BuildContextException {

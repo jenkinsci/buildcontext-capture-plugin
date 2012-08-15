@@ -6,8 +6,8 @@ import hudson.model.AbstractBuild;
 import hudson.remoting.VirtualChannel;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextException;
 import org.jenkinsci.plugins.buildcontextcapture.BuildContextLogger;
+import org.jenkinsci.plugins.buildcontextcapture.type.BuildContextCaptureTypeDescriptor;
 import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureType;
-import org.jenkinsci.plugins.buildcontextcapture.type.FlexibleBuildContextCaptureTypeDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -55,7 +55,7 @@ public class BuildTimeType extends FlexibleBuildContextCaptureType {
 
     @Extension
     @SuppressWarnings("unused")
-    public static class BuildTimeTypeDescriptor extends FlexibleBuildContextCaptureTypeDescriptor<BuildTimeType> {
+    public static class BuildTimeTypeDescriptor extends BuildContextCaptureTypeDescriptor<BuildTimeType> {
 
         @Override
         public Class<? extends FlexibleBuildContextCaptureType> getType() {
